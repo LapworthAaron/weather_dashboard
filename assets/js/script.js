@@ -6,17 +6,23 @@ $('#search-button').on('click',getCity);
 
 //function for the getting lat and lon for city value and passing into ajax call
 function getCity() {
-    var city = $('#search-input').val();
-    var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
-    var queryUrl = url + city + '&appid=' + api_key;
+    if ($('#search-input').val() != '') {
+        var city = $('#search-input').val();
+        var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
+        var queryUrl = url + city + '&appid=' + api_key;
 
-    $.ajax({
-        url: queryUrl,
-        method: "GET"
-      }).then(function(response) {
-        fiveDay(response.city.coord)
-        //TODO: function to store city and coords in localStorage
-    });
+        $.ajax({
+            url: queryUrl,
+            method: "GET"
+        }).fail(function() {
+            alert("We can't find that place, please try again.");
+        }).then(function(response) {
+            fiveDay(response.city.coord);
+            // storeCity();
+        });
+    } else {
+        alert("Please enter a place before searching.");
+    }
     return;
 }
 
@@ -33,7 +39,6 @@ function fiveDay(coords) {
       }).then(function(response) {
         console.log(response);
         weatherHtml(response);
-        
     });
     return
 }
@@ -48,6 +53,7 @@ function weatherHtml(weatherObj) {
     // response.list[0].main.weather[0].description;
     // response.list[0].main.weather[0].icon;
 
+    //TODO: work out which svg needs to be display for each day
     //animated icons https://www.amcharts.com/free-animated-svg-weather-icons/
     //svg files in images folder
 
@@ -55,13 +61,22 @@ function weatherHtml(weatherObj) {
     for (var i = 0; i < dayArray.length; i++) {
         var today = $('#today');
         if (i === 0) {
+            var div = $('<div>');
             var h2 = $('<h2>');
             h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ')');
             today.append(h2);
+            var icon = $('<img>');
+            icon.attr('src', './assets/images/day.svg');
+             div.append(h3, icon);
+            today.append(div);
         } else {
+            var div = $('<div>');
             var h3 = $('<h3>');
             h3.text(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10));
-            today.append(h3);
+            var icon = $('<img>');
+            icon.attr('src', './assets/images/day.svg');
+            div.append(h3, icon);
+            today.append(div);
         }
         var today = $('#today');
         var p1 = $('<p>');
@@ -92,8 +107,28 @@ function dayArrayCreate(weatherObj) {
     console.log(dayArray);
 }
 
+//TODO: 
 //function to store city searched into localStorage
+function storeCity() {
+    var cityList;
+    if (getCity() != undefined) {
+        cityList = getCity();
+        cityList[cityList.length] = agendaValue;
+    } else {
+        cityList[0] = agendaValue;
+    }
+    localStorage.setItem("agendaItems", JSON.stringify(cityList));
+}
 
+//TODO: 
 //function to read city from localStorage
+// function getCity() {
+//     var cityList;
 
+// }
+
+//TODO: 
 //function for loading previously search cities into html buttons
+// function htmlCityList() {
+
+// }
