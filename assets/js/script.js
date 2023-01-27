@@ -2,11 +2,12 @@
 var api_key = 'd8d8a8f555c8a15ae25aa0ba82f82b81';
 var dayArray = [];
 
+getCityList();
 $('#search-button').on('click',getCity);
 
 //function for the getting lat and lon for city value and passing into ajax call
 function getCity() {
-    if ($('#search-input').val() != '') {
+    if ($('#search-input').val() !== '') {
         var city = $('#search-input').val();
         var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
         var queryUrl = url + city + '&appid=' + api_key;
@@ -14,11 +15,9 @@ function getCity() {
         $.ajax({
             url: queryUrl,
             method: "GET"
-        }).fail(function() {
-            alert("We can't find that place, please try again.");
         }).then(function(response) {
             fiveDay(response.city.coord);
-            // storeCity();
+            storeCity($('#search-input').val());
         });
     } else {
         alert("Please enter a place before searching.");
@@ -97,38 +96,50 @@ function dayArrayCreate(weatherObj) {
     var count = 1;
     dayArray[0] = {'date': weatherObj.list[0].dt_txt.substring(0, 10),
                        'index': 0};
-    console.log(weatherObj.list.length);
     for (var i = 1; i < weatherObj.list.length; i++) {
         if ( weatherObj.list[i].dt_txt.substring(0, 10) !== weatherObj.list[i-1].dt_txt.substring(0, 10)) {
             dayArray[count] = {'date': weatherObj.list[i+2].dt_txt.substring(0, 10), 'index': i};
             count++;
         }
     }
-    console.log(dayArray);
+    return;
 }
 
-//TODO: 
 //function to store city searched into localStorage
-function storeCity() {
-    var cityList;
-    if (getCity() != undefined) {
-        cityList = getCity();
-        cityList[cityList.length] = agendaValue;
+function storeCity(city) {
+    var cityList = {list: []};
+    if (localStorage.getItem("cityList") != undefined) {
+        cityList = JSON.parse(localStorage.getItem("cityList"));
+        cityList.list.push(city);
+
     } else {
-        cityList[0] = agendaValue;
+        cityList.list.push(city);
     }
-    localStorage.setItem("agendaItems", JSON.stringify(cityList));
+    $('#search-button').value = '';
+    localStorage.setItem("cityList", JSON.stringify(cityList));
+    getCityList();
+    return;
 }
 
-//TODO: 
 //function to read city from localStorage
-// function getCity() {
-//     var cityList;
-
-// }
-
-//TODO: 
-//function for loading previously search cities into html buttons
-// function htmlCityList() {
-
-// }
+function getCityList() {
+    var cityList;
+    if (localStorage.getItem("cityList") != undefined) {
+        cityList =  JSON.parse(localStorage.getItem("cityList"));
+        console.log(cityList);
+        for (var i = 0; i < cityList.list.length; i++) {
+            if ($('#city_' + i)) {
+                $('#city_' + i).remove();
+            }
+            var city = $('<button>');
+            city.attr({'type':'button',
+                        'aria-label':cityList.list[i],
+                        'class':'btn search-button',
+                        'id':'city_' + i}).html(cityList.list[i]);
+            var cityListDiv = $('.input-group-append');
+            cityListDiv.append(city);
+        }
+        return;
+    }
+    return;
+}
