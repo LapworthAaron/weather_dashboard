@@ -4,6 +4,7 @@ var dayArray = [];
 
 getCityList();
 $('#search-button').on('click',getCity);
+$('.city-button').on('click',getCityBtn);
 
 //function for the getting lat and lon for city value and passing into ajax call
 function getCity() {
@@ -11,18 +12,33 @@ function getCity() {
         var city = $('#search-input').val();
         var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
         var queryUrl = url + city + '&appid=' + api_key;
-
-        $.ajax({
-            url: queryUrl,
-            method: "GET"
-        }).then(function(response) {
-            fiveDay(response.city.coord);
-            storeCity($('#search-input').val());
-        });
+        callAjax(city, queryUrl);
     } else {
         alert("Please enter a place before searching.");
     }
     return;
+}
+
+function getCityBtn() {
+    var city = $(this).text();
+    if (city !== '') {
+        var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
+        var queryUrl = url + city + '&appid=' + api_key;
+        callAjax(city, queryUrl);
+    } else {
+        alert("Please enter a place before searching.");
+    }
+    return;
+}
+
+function callAjax(city, queryUrl) {
+    $.ajax({
+        url: queryUrl,
+        method: "GET"
+    }).then(function(response) {
+        fiveDay(response.city.coord);
+        storeCity(city);
+    });
 }
 
 //function for getting city 5 day forecast
@@ -58,33 +74,33 @@ function weatherHtml(weatherObj) {
 
     dayArrayCreate(weatherObj);
     for (var i = 0; i < dayArray.length; i++) {
-        var today = $('#today');
+        var forecastType;
         if (i === 0) {
+            forecastType = $('#today');
             var div = $('<div>');
             var h2 = $('<h2>');
             h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ')');
-            today.append(h2);
             var icon = $('<img>');
             icon.attr('src', './assets/images/day.svg');
-             div.append(h3, icon);
-            today.append(div);
+            div.append(h2, icon);
+            forecastType.append(div);
         } else {
+            forecastType = $('#forecast');
             var div = $('<div>');
             var h3 = $('<h3>');
             h3.text(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10));
             var icon = $('<img>');
             icon.attr('src', './assets/images/day.svg');
             div.append(h3, icon);
-            today.append(div);
+            forecastType.append(div);
         }
-        var today = $('#today');
         var p1 = $('<p>');
         p1.text('Temp: ' + weatherObj.list[dayArray[i].index].main.temp + ' ℃');
         var p2 = $('<p>');
         p2.text('Wind: ' + Math.floor(weatherObj.list[dayArray[i].index].wind.speed * 3.6 * 100) / 100 + ' KpH');
         var p3 = $('<p>');
         p3.text('Humidity: ' + weatherObj.list[dayArray[i].index].main.humidity + '%');
-        today.append(p1,p2,p3);
+        forecastType.append(p1,p2,p3);
     }
     
 }
@@ -97,7 +113,7 @@ function dayArrayCreate(weatherObj) {
     dayArray[0] = {'date': weatherObj.list[0].dt_txt.substring(0, 10),
                        'index': 0};
     for (var i = 1; i < weatherObj.list.length; i++) {
-        if ( weatherObj.list[i].dt_txt.substring(0, 10) !== weatherObj.list[i-1].dt_txt.substring(0, 10)) {
+        if (weatherObj.list[i].dt_txt.substring(0, 10) !== weatherObj.list[i-1].dt_txt.substring(0, 10)) {
             dayArray[count] = {'date': weatherObj.list[i+2].dt_txt.substring(0, 10), 'index': i};
             count++;
         }
@@ -108,16 +124,22 @@ function dayArrayCreate(weatherObj) {
 //function to store city searched into localStorage
 function storeCity(city) {
     var cityList = {list: []};
-    if (localStorage.getItem("cityList") != undefined) {
-        cityList = JSON.parse(localStorage.getItem("cityList"));
+    city = city.charAt(0).toUpperCase() + city.slice(1)
+    if (localStorage.getItem("cityList") == undefined) {
         cityList.list.push(city);
-
-    } else {
-        cityList.list.push(city);
+        $('#search-input').val('');
+        localStorage.setItem("cityList", JSON.stringify(cityList));
+        getCityList();
+        return;
     }
-    $('#search-button').value = '';
-    localStorage.setItem("cityList", JSON.stringify(cityList));
-    getCityList();
+    
+    cityList = JSON.parse(localStorage.getItem("cityList"));
+    if (!cityList.list.includes(city)) {
+        cityList.list.push(city);
+        localStorage.setItem("cityList", JSON.stringify(cityList));
+        getCityList();
+    }
+    $('#search-input').val('');
     return;
 }
 
@@ -127,19 +149,25 @@ function getCityList() {
     if (localStorage.getItem("cityList") != undefined) {
         cityList =  JSON.parse(localStorage.getItem("cityList"));
         console.log(cityList);
-        for (var i = 0; i < cityList.list.length; i++) {
-            if ($('#city_' + i)) {
-                $('#city_' + i).remove();
-            }
-            var city = $('<button>');
-            city.attr({'type':'button',
-                        'aria-label':cityList.list[i],
-                        'class':'btn search-button',
-                        'id':'city_' + i}).html(cityList.list[i]);
-            var cityListDiv = $('.input-group-append');
-            cityListDiv.append(city);
-        }
+        cityBtns(cityList);
         return;
+    }
+    return;
+}
+
+//function to create city buttons
+function cityBtns(cityList) {
+    for (var i = 0; i < cityList.list.length; i++) {
+        if ($('#city_' + i)) {
+            $('#city_' + i).remove();
+        }
+        var city = $('<button>');
+        city.attr({'type':'button',
+                    'aria-label':cityList.list[i],
+                    'class':'btn city-button',
+                    'id':'city_' + i}).html(cityList.list[i]);
+        var cityListDiv = $('#history');
+        cityListDiv.append(city);
     }
     return;
 }
