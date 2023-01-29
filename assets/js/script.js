@@ -1,10 +1,28 @@
 
 var api_key = 'd8d8a8f555c8a15ae25aa0ba82f82b81';
 var dayArray = [];
+var icons = {'01':'fa fa-solid fa-sun',
+    '02':'fa fa-solid fa-cloud-sun',
+    '03':'fa fa-solid fa-cloud',
+    '04':'fa fa-solid fa-cloud',
+    '09':'fa fa-solid fa-cloud-rain',
+    '10':'fa fa-solid fa-cloud-showers-heavy',
+    '11':'fa fa-solid fa-cloud-bolt',
+    '13':'fa fa-solid fa-snowflake',
+    '50':'fa fa-solid fa-smog'};
+
+
 
 getCityList();
 $('#search-button').on('click',getCity);
-$('.city-button').on('click',getCityBtn);
+$('.cityBtn').on('click',getCityBtn);
+
+//manually remove localStorage item for testing
+// localStorage.removeItem("cityList");
+
+//TODO: svg icons selection
+//TODO: css
+//TODO: html
 
 //function for the getting lat and lon for city value and passing into ajax call
 function getCity() {
@@ -19,6 +37,7 @@ function getCity() {
     return;
 }
 
+//city buttons from localstorage call api
 function getCityBtn() {
     var city = $(this).text();
     if (city !== '') {
@@ -31,6 +50,7 @@ function getCityBtn() {
     return;
 }
 
+//call api
 function callAjax(city, queryUrl) {
     $.ajax({
         url: queryUrl,
@@ -60,39 +80,41 @@ function fiveDay(coords) {
 
 //function for updating html for weather
 function weatherHtml(weatherObj) {
-    // date
-    // response.list[0].dt_txt;
-    // response.list[0].dt;
     // weather
     // response.list[0].main.weather[0].main;
     // response.list[0].main.weather[0].description;
-    // response.list[0].main.weather[0].icon;
-
-    //TODO: work out which svg needs to be display for each day
-    //animated icons https://www.amcharts.com/free-animated-svg-weather-icons/
-    //svg files in images folder
 
     dayArrayCreate(weatherObj);
+    $('#today').empty();
+    $('#forecast').empty();
+
+    $('#forecastHeading').attr("class", "show");
+
     for (var i = 0; i < dayArray.length; i++) {
         var forecastType;
+        var section = $('<section>');
+        var iconCode = weatherObj.list[dayArray[i].index].weather[0].icon.substring(0,2);
+        console.log(icons[iconCode]);
         if (i === 0) {
             forecastType = $('#today');
             var div = $('<div>');
+            div.attr('class','forecastDiv');
             var h2 = $('<h2>');
-            h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ')');
-            var icon = $('<img>');
-            icon.attr('src', './assets/images/day.svg');
-            div.append(h2, icon);
-            forecastType.append(div);
+            h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ') ');
+            h2.append("<span class='" + icons[iconCode] + "'></span>");
+            div.append(h2);
+            section.append(div);
         } else {
             forecastType = $('#forecast');
             var div = $('<div>');
-            var h3 = $('<h3>');
-            h3.text(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10));
-            var icon = $('<img>');
-            icon.attr('src', './assets/images/day.svg');
-            div.append(h3, icon);
-            forecastType.append(div);
+            div.attr('class','forecastDiv');
+            var h5 = $('<h5>');
+            h5.text(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10));
+            var icon = $('<h5>');
+            icon.append("<span class='" + icons[iconCode] + "'></span>");
+            div.append(h5, icon);
+            section.attr('class','forecastBox');
+            section.append(div);
         }
         var p1 = $('<p>');
         p1.text('Temp: ' + weatherObj.list[dayArray[i].index].main.temp + ' ℃');
@@ -100,7 +122,8 @@ function weatherHtml(weatherObj) {
         p2.text('Wind: ' + Math.floor(weatherObj.list[dayArray[i].index].wind.speed * 3.6 * 100) / 100 + ' KpH');
         var p3 = $('<p>');
         p3.text('Humidity: ' + weatherObj.list[dayArray[i].index].main.humidity + '%');
-        forecastType.append(p1,p2,p3);
+        section.append(p1,p2,p3);
+        forecastType.append(section);
     }
     
 }
@@ -148,7 +171,6 @@ function getCityList() {
     var cityList;
     if (localStorage.getItem("cityList") != undefined) {
         cityList =  JSON.parse(localStorage.getItem("cityList"));
-        console.log(cityList);
         cityBtns(cityList);
         return;
     }
@@ -164,7 +186,7 @@ function cityBtns(cityList) {
         var city = $('<button>');
         city.attr({'type':'button',
                     'aria-label':cityList.list[i],
-                    'class':'btn city-button',
+                    'class':'cityBtn',
                     'id':'city_' + i}).html(cityList.list[i]);
         var cityListDiv = $('#history');
         cityListDiv.append(city);
