@@ -14,19 +14,23 @@ body {
   line-height: 1.5;
 }
 
+#search-input {
+    width: 100%;
+}
+
 .searchBtn {
     background-color: cornflowerblue;
     color: white;
     border-radius: 0.25rem;
     margin-top: 10px;
     overflow: visible;
-    width: 11rem;
+    width: 100%;
 }
 
 .cityBtn {
     background-color: grey;
     margin-bottom: 5px;
-    width: 11rem;
+    width: 100%;
     border-radius: 0.25rem;
 }
 

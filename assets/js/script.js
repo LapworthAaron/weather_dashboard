@@ -20,7 +20,6 @@ $('.cityBtn').on('click',getCityBtn);
 //manually remove localStorage item for testing
 // localStorage.removeItem("cityList");
 
-//TODO: svg icons selection
 //TODO: css
 //TODO: html
 
