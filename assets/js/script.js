@@ -101,7 +101,8 @@ function weatherHtml(weatherObj) {
             var div = $('<div>');
             div.attr('class','forecastDiv');
             var h2 = $('<h2>');
-            h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ') ');
+            var date = moment(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10), "YYYY-MM-DD").format('DD/MM/YYYY');
+            h2.text(weatherObj.city.name + ' (' + date + ') ');
             h2.attr('id','todayH2');
             h2.append("<span class='" + icons[iconCode] + "'></span>");
             div.append(h2);
@@ -112,7 +113,8 @@ function weatherHtml(weatherObj) {
             var div = $('<div>');
             div.attr('class','forecastDiv');
             var h5 = $('<h5>');
-            h5.text(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10));
+            var date = moment(weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10), "YYYY-MM-DD").format('DD/MM/YYYY');
+            h5.text(date);
             var icon = $('<h5>');
             icon.append("<span class='" + icons[iconCode] + "'></span>");
             div.append(h5, icon);

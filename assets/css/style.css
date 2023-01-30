@@ -1,3 +1,9 @@
+:root {
+	--primary_colour: #001d3d;
+    --border_radius: 5px;
+    --gap_5day: 0.5rem;
+}
+
 /* reset */
 * {
     box-sizing: border-box;
@@ -11,7 +17,7 @@ body {
 }
 
 .myHeader {
-    background-color: #001d3d;
+    background-color: var(--primary_colour);
 }
 
 #search-input {
@@ -23,7 +29,7 @@ button {
 }
 
 .searchBtn, .clearBtn {
-    background-color: #001d3d;
+    background-color: var(--primary_colour);
     color: white;
     border-radius: 0.25rem;
     margin-top: 10px;
@@ -69,14 +75,14 @@ button {
 .today {
     padding: 1rem;
     color: black;
-    border-radius: 5px;
+    border-radius: var(--border_radius);
 }
 
 .forecastBox {
     padding: 1rem;
-    background-color: #001d3d;
+    background-color: var(--primary_colour);
     color: white;
-    border-radius: 5px;
+    border-radius: var(--border_radius);
 }
 
 .forecastBox span {
@@ -88,7 +94,7 @@ button {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         grid-auto-flow: row;
-        gap: 0.5rem;
+        gap: var(--gap_5day);
     }
 }
 
@@ -97,7 +103,7 @@ button {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-auto-flow: row;
-        gap: 0.5rem;
+        gap: var(--gap_5day);
     }
 }
 
@@ -106,7 +112,7 @@ button {
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-auto-flow: row;
-        gap: 0.5em;
+        gap: var(--gap_5day);
     }
 }
 
@@ -115,6 +121,6 @@ button {
         display: grid;
         grid-template-columns: 1fr;
         grid-auto-flow: row;
-        gap: 2em;
+        gap: var(--gap_5day);
     }
 }
