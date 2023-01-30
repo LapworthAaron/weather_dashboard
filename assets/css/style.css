@@ -17,7 +17,8 @@ body {
 }
 
 .myHeader {
-    background-color: var(--primary_colour);
+    /* background-color: var(--primary_colour); */
+    background: linear-gradient(90deg, var(--primary_colour) 0%, rgba(9,9,121,1) 53%, rgba(0,212,255,1) 100%);
 }
 
 #search-input {
