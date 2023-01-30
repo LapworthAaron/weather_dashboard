@@ -100,6 +100,7 @@ function weatherHtml(weatherObj) {
             div.attr('class','forecastDiv');
             var h2 = $('<h2>');
             h2.text(weatherObj.city.name + ' (' + weatherObj.list[dayArray[i].index].dt_txt.substring(0, 10) + ') ');
+            h2.attr('id','todayH2');
             h2.append("<span class='" + icons[iconCode] + "'></span>");
             div.append(h2);
             section.append(div);
