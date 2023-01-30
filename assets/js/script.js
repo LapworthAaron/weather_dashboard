@@ -1,6 +1,6 @@
-
 var api_key = 'd8d8a8f555c8a15ae25aa0ba82f82b81';
 var dayArray = [];
+//object to display the appropriate weather icon
 var icons = {'01':'fa fa-solid fa-sun',
     '02':'fa fa-solid fa-cloud-sun',
     '03':'fa fa-solid fa-cloud',
@@ -11,17 +11,20 @@ var icons = {'01':'fa fa-solid fa-sun',
     '13':'fa fa-solid fa-snowflake',
     '50':'fa fa-solid fa-smog'};
 
+init();
 
+//first load of page
+function init() {
+    getCityList();
+    $('#search-button').on('click',getCity);
+}
 
-getCityList();
-$('#search-button').on('click',getCity);
-$('.cityBtn').on('click',getCityBtn);
-
-//manually remove localStorage item for testing
-// localStorage.removeItem("cityList");
-
-//TODO: css
-//TODO: html
+//remove localStorage city history
+function clearHistory() {
+    localStorage.removeItem("cityList");
+    var cityListDiv = $('#history');
+    cityListDiv.empty();
+}
 
 //function for the getting lat and lon for city value and passing into ajax call
 function getCity() {
@@ -39,6 +42,7 @@ function getCity() {
 //city buttons from localstorage call api
 function getCityBtn() {
     var city = $(this).text();
+    console.log(city);
     if (city !== '') {
         var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
         var queryUrl = url + city + '&appid=' + api_key;
@@ -79,21 +83,19 @@ function fiveDay(coords) {
 
 //function for updating html for weather
 function weatherHtml(weatherObj) {
-    // weather
-    // response.list[0].main.weather[0].main;
-    // response.list[0].main.weather[0].description;
-
     dayArrayCreate(weatherObj);
     $('#today').empty();
     $('#forecast').empty();
-
+    //show forecastHeading and today section
     $('#forecastHeading').attr("class", "show");
+    $('#today').attr("class", "today show");
 
     for (var i = 0; i < dayArray.length; i++) {
         var forecastType;
         var section = $('<section>');
+        //get weather icon code to translate to font awesome icons
         var iconCode = weatherObj.list[dayArray[i].index].weather[0].icon.substring(0,2);
-        console.log(icons[iconCode]);
+        //if the object data is for today
         if (i === 0) {
             forecastType = $('#today');
             var div = $('<div>');
@@ -105,6 +107,7 @@ function weatherHtml(weatherObj) {
             div.append(h2);
             section.append(div);
         } else {
+            //if the object data is for the 5 day forecast
             forecastType = $('#forecast');
             var div = $('<div>');
             div.attr('class','forecastDiv');
@@ -116,12 +119,13 @@ function weatherHtml(weatherObj) {
             section.attr('class','forecastBox');
             section.append(div);
         }
+        //universal to all forecasting
         var p1 = $('<p>');
-        p1.text('Temp: ' + weatherObj.list[dayArray[i].index].main.temp + ' ℃');
+        p1.html('<strong>Temp:</strong> ' + weatherObj.list[dayArray[i].index].main.temp + ' ℃');
         var p2 = $('<p>');
-        p2.text('Wind: ' + Math.floor(weatherObj.list[dayArray[i].index].wind.speed * 3.6 * 100) / 100 + ' KpH');
+        p2.html('<strong>Wind:</strong> ' + Math.floor(weatherObj.list[dayArray[i].index].wind.speed * 3.6 * 100) / 100 + ' KpH');
         var p3 = $('<p>');
-        p3.text('Humidity: ' + weatherObj.list[dayArray[i].index].main.humidity + '%');
+        p3.html('<strong>Humidity:</strong> ' + weatherObj.list[dayArray[i].index].main.humidity + '%');
         section.append(p1,p2,p3);
         forecastType.append(section);
     }
@@ -179,17 +183,26 @@ function getCityList() {
 
 //function to create city buttons
 function cityBtns(cityList) {
+    var cityListDiv = $('#history');
+    cityListDiv.empty();
     for (var i = 0; i < cityList.list.length; i++) {
-        if ($('#city_' + i)) {
-            $('#city_' + i).remove();
-        }
+        // if ($('#city_' + i)) {
+        //     // $('#city_' + i).remove();
+        // }
         var city = $('<button>');
         city.attr({'type':'button',
                     'aria-label':cityList.list[i],
                     'class':'cityBtn',
                     'id':'city_' + i}).html(cityList.list[i]);
-        var cityListDiv = $('#history');
         cityListDiv.append(city);
     }
+    var remove = $('<button>');
+    remove.attr({'type':'button',
+                    'aria-label': 'clear history button',
+                    'class':'clearBtn',
+                    'id':'clearBtn'}).html('Clear History');
+    cityListDiv.append(remove);
+    $('.cityBtn').on('click',getCityBtn);
+    $('#clearBtn').on('click',clearHistory);
     return;
 }

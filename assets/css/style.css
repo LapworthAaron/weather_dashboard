@@ -10,6 +10,10 @@ body {
   line-height: 1.5;
 }
 
+.myHeader {
+    background-color: #001d3d;
+}
+
 #search-input {
     width: 100%;
 }
@@ -18,8 +22,8 @@ button {
     border: 0;
 }
 
-.searchBtn {
-    background-color: cornflowerblue;
+.searchBtn, .clearBtn {
+    background-color: #001d3d;
     color: white;
     border-radius: 0.25rem;
     margin-top: 10px;
@@ -39,7 +43,7 @@ button {
     box-sizing: border-box;
 }
 
-.hiddenHeading {
+.hidden {
     visibility: hidden;
 }
 
