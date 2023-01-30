@@ -57,7 +57,8 @@ function getCityBtn() {
 function callAjax(city, queryUrl) {
     $.ajax({
         url: queryUrl,
-        method: "GET"
+        method: "GET",
+        error: alert("This place does not exist, please try again.")
     }).then(function(response) {
         fiveDay(response.city.coord);
         storeCity(city);
