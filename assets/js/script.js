@@ -56,14 +56,10 @@ function getCityBtn() {
 function callAjax(city, queryUrl) {
     $.ajax({
         url: queryUrl,
-        method: "GET",
-        success: function (response) {
-            fiveDay(response.city.coord);
-            storeCity(city);
-          },
-        error: function (result, status, err) {
-            alert("This place does not exist, please try again.");
-          }
+        method: "GET"
+    }).then( function(response) {
+        fiveDay(response.city.coord);
+        storeCity(city);
     });
 }
 
