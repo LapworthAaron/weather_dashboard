@@ -42,7 +42,6 @@ function getCity() {
 //city buttons from localstorage call api
 function getCityBtn() {
     var city = $(this).text();
-    console.log(city);
     if (city !== '') {
         var url = 'https://api.openweathermap.org/data/2.5/forecast?q=';
         var queryUrl = url + city + '&appid=' + api_key;
@@ -58,10 +57,13 @@ function callAjax(city, queryUrl) {
     $.ajax({
         url: queryUrl,
         method: "GET",
-        error: alert("This place does not exist, please try again.")
-    }).then(function(response) {
-        fiveDay(response.city.coord);
-        storeCity(city);
+        success: function (response) {
+            fiveDay(response.city.coord);
+            storeCity(city);
+          },
+        error: function (result, status, err) {
+            alert("This place does not exist, please try again.");
+          }
     });
 }
 
@@ -76,7 +78,6 @@ function fiveDay(coords) {
         url: queryUrl,
         method: "GET"
       }).then(function(response) {
-        console.log(response);
         weatherHtml(response);
     });
     return
